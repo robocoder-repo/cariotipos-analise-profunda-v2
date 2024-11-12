@@ -5,15 +5,16 @@ Este é um aplicativo simples para Windows que analisa cariótipos através de i
 ## Funcionalidades
 
 - Carrega imagens de cariótipos
-- Analisa a imagem para detectar e contar cromossomos
-- Fornece uma saída científica básica sobre o cariótipo
+- Processa a imagem para detectar cromossomos
+- Conta o número de cromossomos detectados
+- Fornece uma saída básica sobre o cariótipo
+- Gera imagens intermediárias para visualização do processo
 
 ## Requisitos
 
 - Python 3.7+
 - OpenCV
 - NumPy
-- PyQt5
 
 ## Instalação
 
@@ -23,37 +24,37 @@ Este é um aplicativo simples para Windows que analisa cariótipos através de i
    cd karyotype-analyzer
    ```
 
-2. Crie um ambiente virtual (opcional, mas recomendado):
+2. Instale as dependências:
    ```
-   python -m venv venv
-   source venv/bin/activate  # No Windows use: venv\Scripts\activate
-   ```
-
-3. Instale as dependências:
-   ```
-   pip install opencv-python numpy PyQt5
+   pip install opencv-python numpy
    ```
 
 ## Uso
 
 1. Execute o aplicativo:
    ```
-   python karyotype_analyzer.py
+   python karyotype_analyzer.py <caminho_da_imagem>
    ```
 
-2. Na interface gráfica:
-   - Clique em "Load Image" para carregar uma imagem de cariótipo
-   - Clique em "Analyze Karyotype" para processar a imagem e obter resultados
+2. O script irá processar a imagem e fornecer uma saída com o número de cromossomos detectados.
 
-3. Os resultados serão exibidos na interface, incluindo:
-   - Número de cromossomos detectados
-   - Interpretação básica do cariótipo
+3. Imagens intermediárias e o resultado final serão salvos no diretório atual.
 
 ## Limitações
 
-- Este é um aplicativo básico e pode não ser preciso para uso clínico ou profissional
-- A detecção de cromossomos depende da qualidade da imagem e do contraste
-- Não distingue entre diferentes tipos de cromossomos ou anomalias específicas
+- Este é um aplicativo básico e pode não ser preciso para uso clínico ou profissional.
+- A detecção de cromossomos depende muito da qualidade da imagem de entrada e do contraste entre os cromossomos e o fundo.
+- O aplicativo não distingue entre diferentes tipos de cromossomos ou anomalias específicas.
+- A contagem atual pode não ser precisa para todos os tipos de imagens de cariótipo.
+
+## Possíveis Melhorias Futuras
+
+1. Implementar técnicas mais avançadas de processamento de imagem para melhorar a detecção de cromossomos.
+2. Adicionar capacidade de distinguir entre diferentes tipos de cromossomos.
+3. Implementar uma interface gráfica para facilitar o uso.
+4. Adicionar capacidade de detectar anomalias cromossômicas específicas.
+5. Melhorar a robustez do algoritmo para lidar com diferentes qualidades de imagem e preparações de cariótipo.
+6. Implementar testes unitários e de integração para garantir a confiabilidade do código.
 
 ## Contribuições
 
