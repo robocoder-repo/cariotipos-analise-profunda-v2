@@ -5,7 +5,6 @@
 
 
 
-
 import cv2
 import numpy as np
 import sys
@@ -33,27 +32,13 @@ def analyze_karyotype(image_path):
     _, sure_fg = cv2.threshold(dist, 0.5*dist.max(), 255, 0)
     sure_fg = np.uint8(sure_fg)
     
-    # Watershed para separar cromossomos unidos
-    unknown = cv2.subtract(binary, sure_fg)
-    _, markers = cv2.connectedComponents(sure_fg)
-    markers = markers + 1
-    markers[unknown == 255] = 0
-    markers = cv2.watershed(image, markers)
-    
     # Encontrar contornos
-    contours = []
-    for label in np.unique(markers):
-        if label == 0 or label == -1:
-            continue
-        mask = np.zeros(gray.shape, dtype="uint8")
-        mask[markers == label] = 255
-        cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contours.extend(cnts)
+    contours, _ = cv2.findContours(sure_fg, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     # Filtrar contornos
-    min_area = 20  # Reduzido para capturar cromossomos menores
-    max_area = 10000  # Aumentado para incluir possíveis grupos de cromossomos
-    min_aspect_ratio = 1.02  # Reduzido para capturar cromossomos mais arredondados
+    min_area = 30  # Reduzido para capturar cromossomos menores
+    max_area = 5000  # Aumentado para incluir possíveis grupos de cromossomos
+    min_aspect_ratio = 1.05  # Reduzido para capturar cromossomos mais arredondados
     chromosomes = [cnt for cnt in contours if min_area < cv2.contourArea(cnt) < max_area]
     chromosomes = [cnt for cnt in chromosomes if cv2.boundingRect(cnt)[3] / cv2.boundingRect(cnt)[2] > min_aspect_ratio]
     
@@ -68,7 +53,6 @@ def analyze_karyotype(image_path):
     cv2.imwrite('gray.png', gray)
     cv2.imwrite('binary.png', binary)
     cv2.imwrite('sure_fg.png', sure_fg)
-    cv2.imwrite('watershed.png', markers.astype(np.uint8) * 10)
     
     result = f"Detected {chromosome_count} chromosomes."
     if chromosome_count == 46:
@@ -89,8 +73,7 @@ if __name__ == '__main__':
     result = analyze_karyotype(image_path)
     print(result)
     print("Visualization saved as 'detected_chromosomes.png'")
-    print("Intermediate images saved as 'gray.png', 'binary.png', 'sure_fg.png', and 'watershed.png'")
-
+    print("Intermediate images saved as 'gray.png', 'binary.png', and 'sure_fg.png'")
 
 
 
