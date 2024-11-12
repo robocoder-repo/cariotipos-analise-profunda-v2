@@ -1,7 +1,6 @@
 
 
 
-
 import cv2
 import numpy as np
 import sys
@@ -23,18 +22,13 @@ def analyze_karyotype(image_path):
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     # Filter contours based on area and aspect ratio to remove small noise and non-chromosome shapes
-    min_area = 20  # Reduced from 50
-    max_area = 10000  # Increased from 5000
-    min_aspect_ratio = 1.2  # Reduced from 1.5
+    min_area = 50
+    max_area = 5000
+    min_aspect_ratio = 1.5
     chromosomes = [cnt for cnt in contours if min_area < cv2.contourArea(cnt) < max_area]
     chromosomes = [cnt for cnt in chromosomes if cv2.boundingRect(cnt)[3] / cv2.boundingRect(cnt)[2] > min_aspect_ratio]
     
     chromosome_count = len(chromosomes)
-    
-    # Visualize detected chromosomes
-    vis_image = image.copy()
-    cv2.drawContours(vis_image, chromosomes, -1, (0, 255, 0), 2)
-    cv2.imwrite('detected_chromosomes.png', vis_image)
     
     result = f"Detected {chromosome_count} chromosomes."
     if chromosome_count == 46:
@@ -54,7 +48,5 @@ if __name__ == '__main__':
     image_path = sys.argv[1]
     result = analyze_karyotype(image_path)
     print(result)
-    print("Visualization saved as 'detected_chromosomes.png'")
-
 
 
