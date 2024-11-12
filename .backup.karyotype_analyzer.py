@@ -1,6 +1,5 @@
 
 
-
 import cv2
 import numpy as np
 import sys
@@ -13,20 +12,12 @@ def analyze_karyotype(image_path):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     
-    # Apply morphological operations to separate touching chromosomes
-    kernel = np.ones((3,3), np.uint8)
-    binary = cv2.erode(binary, kernel, iterations=1)
-    binary = cv2.dilate(binary, kernel, iterations=1)
-    
     # Find contours
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
-    # Filter contours based on area and aspect ratio to remove small noise and non-chromosome shapes
-    min_area = 50
-    max_area = 5000
-    min_aspect_ratio = 1.5
-    chromosomes = [cnt for cnt in contours if min_area < cv2.contourArea(cnt) < max_area]
-    chromosomes = [cnt for cnt in chromosomes if cv2.boundingRect(cnt)[3] / cv2.boundingRect(cnt)[2] > min_aspect_ratio]
+    # Filter contours based on area to remove small noise
+    min_area = 100
+    chromosomes = [cnt for cnt in contours if cv2.contourArea(cnt) > min_area]
     
     chromosome_count = len(chromosomes)
     
@@ -48,5 +39,4 @@ if __name__ == '__main__':
     image_path = sys.argv[1]
     result = analyze_karyotype(image_path)
     print(result)
-
 
