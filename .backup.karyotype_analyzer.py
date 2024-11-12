@@ -4,7 +4,6 @@
 
 
 
-
 import cv2
 import numpy as np
 import sys
@@ -24,21 +23,16 @@ def analyze_karyotype(image_path):
     
     # Operações morfológicas
     kernel = np.ones((3,3), np.uint8)
-    binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel, iterations=1)
-    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=1)
-    
-    # Transformação de distância
-    dist = cv2.distanceTransform(binary, cv2.DIST_L2, 5)
-    _, sure_fg = cv2.threshold(dist, 0.5*dist.max(), 255, 0)
-    sure_fg = np.uint8(sure_fg)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel, iterations=2)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=2)
     
     # Encontrar contornos
-    contours, _ = cv2.findContours(sure_fg, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     # Filtrar contornos
-    min_area = 30  # Reduzido para capturar cromossomos menores
-    max_area = 5000  # Aumentado para incluir possíveis grupos de cromossomos
-    min_aspect_ratio = 1.05  # Reduzido para capturar cromossomos mais arredondados
+    min_area = 50  # Reduzido para capturar cromossomos menores
+    max_area = 3000  # Reduzido para evitar grupos de cromossomos
+    min_aspect_ratio = 1.1  # Reduzido para capturar cromossomos mais arredondados
     chromosomes = [cnt for cnt in contours if min_area < cv2.contourArea(cnt) < max_area]
     chromosomes = [cnt for cnt in chromosomes if cv2.boundingRect(cnt)[3] / cv2.boundingRect(cnt)[2] > min_aspect_ratio]
     
@@ -52,7 +46,6 @@ def analyze_karyotype(image_path):
     # Salvar imagens intermediárias
     cv2.imwrite('gray.png', gray)
     cv2.imwrite('binary.png', binary)
-    cv2.imwrite('sure_fg.png', sure_fg)
     
     result = f"Detected {chromosome_count} chromosomes."
     if chromosome_count == 46:
@@ -73,8 +66,7 @@ if __name__ == '__main__':
     result = analyze_karyotype(image_path)
     print(result)
     print("Visualization saved as 'detected_chromosomes.png'")
-    print("Intermediate images saved as 'gray.png', 'binary.png', and 'sure_fg.png'")
-
+    print("Intermediate images saved as 'gray.png' and 'binary.png'")
 
 
 
