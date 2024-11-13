@@ -1,65 +1,70 @@
-# Karyotype Analyzer
+# Analisador de Cariótipo
 
-Este é um aplicativo simples para Windows que analisa cariótipos através de imagens inseridas em qualquer formato comum (PNG, JPG, BMP).
+Este projeto é um analisador de cariótipo automatizado desenvolvido em Python. Ele utiliza técnicas de processamento de imagem e visão computacional para detectar, contar e analisar cromossomos em imagens de cariótipos.
 
 ## Funcionalidades
 
-- Carrega imagens de cariótipos
-- Processa a imagem para detectar cromossomos
-- Conta o número de cromossomos detectados
-- Fornece uma saída básica sobre o cariótipo
-- Gera imagens intermediárias para visualização do processo
+- Detecção automática de cromossomos em imagens de cariótipos
+- Contagem precisa do número de cromossomos
+- Análise detalhada de cada cromossomo, incluindo:
+  - Área
+  - Perímetro
+  - Razão de aspecto
+  - Índice centromérico
+  - Classificação (Telocêntrico, Acrocêntrico, Submetacêntrico, Metacêntrico)
+- Análise estatística dos cromossomos detectados
+- Identificação de possíveis anomalias cromossômicas
+- Visualização dos cromossomos detectados
 
 ## Requisitos
 
 - Python 3.7+
 - OpenCV
 - NumPy
+- SciPy
 
 ## Instalação
 
 1. Clone este repositório:
    ```
-   git clone https://github.com/ezrafchev/karyotype-analyzer.git
-   cd karyotype-analyzer
+   git clone https://github.com/seu-usuario/analisador-cariotipo.git
+   cd analisador-cariotipo
    ```
 
 2. Instale as dependências:
    ```
-   pip install opencv-python numpy
+   pip install opencv-python numpy scipy
    ```
 
 ## Uso
 
-1. Execute o aplicativo:
-   ```
-   python karyotype_analyzer.py <caminho_da_imagem>
-   ```
+Execute o script principal fornecendo o caminho para a imagem do cariótipo:
 
-2. O script irá processar a imagem e fornecer uma saída com o número de cromossomos detectados.
+```
+python karyotype_analyzer.py caminho/para/sua/imagem.png
+```
 
-3. Imagens intermediárias e o resultado final serão salvos no diretório atual.
+O script irá analisar a imagem e fornecer um relatório detalhado sobre os cromossomos detectados. Além disso, ele salvará uma imagem com os cromossomos detectados e numerados como 'detected_chromosomes.png'.
+
+## Saída
+
+O script fornece as seguintes informações:
+
+1. Número total de cromossomos detectados
+2. Possível interpretação do número de cromossomos (normal, deleção, duplicação)
+3. Detalhes de cada cromossomo detectado
+4. Análise estatística dos cromossomos
+5. Identificação de cromossomos potencialmente anormais
 
 ## Limitações
 
-- Este é um aplicativo básico e pode não ser preciso para uso clínico ou profissional.
-- A detecção de cromossomos depende muito da qualidade da imagem de entrada e do contraste entre os cromossomos e o fundo.
-- O aplicativo não distingue entre diferentes tipos de cromossomos ou anomalias específicas.
-- A contagem atual pode não ser precisa para todos os tipos de imagens de cariótipo.
-
-## Possíveis Melhorias Futuras
-
-1. Implementar técnicas mais avançadas de processamento de imagem para melhorar a detecção de cromossomos.
-2. Adicionar capacidade de distinguir entre diferentes tipos de cromossomos.
-3. Implementar uma interface gráfica para facilitar o uso.
-4. Adicionar capacidade de detectar anomalias cromossômicas específicas.
-5. Melhorar a robustez do algoritmo para lidar com diferentes qualidades de imagem e preparações de cariótipo.
-6. Implementar testes unitários e de integração para garantir a confiabilidade do código.
+- O desempenho do analisador pode variar dependendo da qualidade da imagem de entrada
+- A precisão da detecção e classificação dos cromossomos pode ser afetada por sobreposições ou distorções na imagem
 
 ## Contribuições
 
-Contribuições são bem-vindas! Por favor, abra uma issue para discutir mudanças importantes antes de fazer um pull request.
+Contribuições para melhorar este projeto são bem-vindas. Por favor, sinta-se à vontade para abrir issues ou enviar pull requests com melhorias.
 
 ## Licença
 
-Este projeto está licenciado sob a MIT License.
+Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.

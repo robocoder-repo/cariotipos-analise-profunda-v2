@@ -1,14 +1,7 @@
-
-
-
-
-
-
-
-
 import cv2
 import numpy as np
 import sys
+from scipy import stats
 
 def analyze_karyotype(image_path):
     image = cv2.imread(image_path)
@@ -51,49 +44,99 @@ def analyze_karyotype(image_path):
         contours.extend(cnts)
     
     # Filtrar contornos
-    min_area = 20  # Reduzido para capturar cromossomos menores
-    max_area = 10000  # Aumentado para incluir possíveis grupos de cromossomos
-    min_aspect_ratio = 1.02  # Reduzido para capturar cromossomos mais arredondados
+    min_area = 20
+    max_area = 10000
+    min_aspect_ratio = 1.02
     chromosomes = [cnt for cnt in contours if min_area < cv2.contourArea(cnt) < max_area]
     chromosomes = [cnt for cnt in chromosomes if cv2.boundingRect(cnt)[3] / cv2.boundingRect(cnt)[2] > min_aspect_ratio]
     
     chromosome_count = len(chromosomes)
     
+    # Análise detalhada dos cromossomos
+    chromosome_details = []
+    for i, cnt in enumerate(chromosomes):
+        area = cv2.contourArea(cnt)
+        perimeter = cv2.arcLength(cnt, True)
+        x, y, w, h = cv2.boundingRect(cnt)
+        aspect_ratio = h / w
+        
+        # Calcular o índice centromérico
+        mask = np.zeros(gray.shape, dtype="uint8")
+        cv2.drawContours(mask, [cnt], -1, 255, -1)
+        chromosome_image = cv2.bitwise_and(gray, gray, mask=mask)
+        profile = np.sum(chromosome_image[y:y+h, x:x+w], axis=1)
+        centromere_pos = np.argmin(profile)
+        centromeric_index = centromere_pos / h
+        
+        # Classificar o cromossomo
+        if centromeric_index <= 0.125:
+            classification = "Telocêntrico"
+        elif 0.125 < centromeric_index <= 0.25:
+            classification = "Acrocêntrico"
+        elif 0.25 < centromeric_index <= 0.375:
+            classification = "Submetacêntrico"
+        else:
+            classification = "Metacêntrico"
+        
+        chromosome_details.append({
+            'number': i+1,
+            'area': area,
+            'perimeter': perimeter,
+            'aspect_ratio': aspect_ratio,
+            'centromeric_index': centromeric_index,
+            'classification': classification
+        })
+    
     # Visualizar cromossomos detectados
     vis_image = image.copy()
-    cv2.drawContours(vis_image, chromosomes, -1, (0, 255, 0), 2)
+    for i, cnt in enumerate(chromosomes):
+        cv2.drawContours(vis_image, [cnt], -1, (0, 255, 0), 2)
+        M = cv2.moments(cnt)
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+        cv2.putText(vis_image, str(i+1), (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
     cv2.imwrite('detected_chromosomes.png', vis_image)
     
-    # Salvar imagens intermediárias
-    cv2.imwrite('gray.png', gray)
-    cv2.imwrite('binary.png', binary)
-    cv2.imwrite('sure_fg.png', sure_fg)
-    cv2.imwrite('watershed.png', markers.astype(np.uint8) * 10)
-    
-    result = f"Detected {chromosome_count} chromosomes."
+    # Preparar resultado
+    result = f"Detectados {chromosome_count} cromossomos.\n"
     if chromosome_count == 46:
-        result += " This appears to be a normal human karyotype."
+        result += "Este parece ser um cariótipo humano normal.\n"
     elif chromosome_count < 46:
-        result += " This may indicate chromosomal deletion or loss."
+        result += "Isso pode indicar uma deleção cromossômica ou perda.\n"
     elif chromosome_count > 46:
-        result += " This may indicate chromosomal duplication or gain."
+        result += "Isso pode indicar uma duplicação cromossômica ou ganho.\n"
+    
+    result += "\nDetalhes dos cromossomos:\n"
+    for chrom in chromosome_details:
+        result += f"Cromossomo {chrom['number']}:\n"
+        result += f"  Área: {chrom['area']:.2f} pixels quadrados\n"
+        result += f"  Perímetro: {chrom['perimeter']:.2f} pixels\n"
+        result += f"  Razão de aspecto: {chrom['aspect_ratio']:.2f}\n"
+        result += f"  Índice centromérico: {chrom['centromeric_index']:.2f}\n"
+        result += f"  Classificação: {chrom['classification']}\n\n"
+    
+    # Análise estatística
+    areas = [chrom['area'] for chrom in chromosome_details]
+    mean_area = np.mean(areas)
+    std_area = np.std(areas)
+    z_scores = stats.zscore(areas)
+    
+    result += "Análise estatística:\n"
+    result += f"  Área média dos cromossomos: {mean_area:.2f} pixels quadrados\n"
+    result += f"  Desvio padrão da área: {std_area:.2f} pixels quadrados\n"
+    result += "  Cromossomos potencialmente anormais (z-score > 2 ou < -2):\n"
+    for i, z in enumerate(z_scores):
+        if abs(z) > 2:
+            result += f"    Cromossomo {i+1}: z-score = {z:.2f}\n"
     
     return result
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("Usage: python karyotype_analyzer.py <image_path>")
+        print("Uso: python karyotype_analyzer.py <caminho_da_imagem>")
         sys.exit(1)
     
     image_path = sys.argv[1]
     result = analyze_karyotype(image_path)
     print(result)
-    print("Visualization saved as 'detected_chromosomes.png'")
-    print("Intermediate images saved as 'gray.png', 'binary.png', 'sure_fg.png', and 'watershed.png'")
-
-
-
-
-
-
-
+    print("Visualização salva como 'detected_chromosomes.png'")
