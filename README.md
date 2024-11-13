@@ -21,10 +21,18 @@ Este projeto é uma versão aprimorada do analisador de cariótipo automatizado,
 - BioPython
 - WGDI
 
-## Instalação e Uso
+## Instalação e Uso Passo a Passo
 
-Consulte o código fonte para instruções detalhadas de instalação e uso.
+1. Instale o Python 3.7+ de python.org
+2. Instale o Git de git-scm.com
+3. Clone o repositório: git clone https://github.com/ezrafchev/cariotipo-completo-biopython-wgdi.git
+4. Entre no diretório: cd cariotipo-completo-biopython-wgdi
+5. Instale as dependências: pip install opencv-python numpy scipy biopython wgdi
+6. Execute o script: python karyotype_analyzer.py nome_da_imagem.png
+7. Veja os resultados no terminal e na imagem 'detected_chromosomes.png'
+
+Para instruções mais detalhadas, consulte o código fonte.
 
 ## Licença
 
-Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+Este projeto está licenciado sob a licença MIT.
